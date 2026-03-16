@@ -26,6 +26,13 @@ data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
 
+data "aws_prefix_list" "s3" {
+  filter {
+    name   = "prefix-list-name"
+    values = ["com.amazonaws.${data.aws_region.current.name}.s3"]
+  }
+}
+
 #====================================================================
 # VPC
 #====================================================================
@@ -857,11 +864,19 @@ resource "aws_security_group" "airflow" {
   }
 
   egress {
-    description = "All outbound"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTPS to VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr, "10.0.0.0/8"]
+  }
+
+  egress {
+    description = "S3 access"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    prefix_list_ids = [data.aws_prefix_list.s3.id]
   }
 
   tags = merge(var.tags, {
@@ -943,11 +958,19 @@ resource "aws_security_group" "lambda" {
   vpc_id      = aws_vpc.data.id
 
   egress {
-    description = "All outbound"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTPS to VPC endpoints"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
+  }
+
+  egress {
+    description = "S3 access"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    prefix_list_ids = [data.aws_prefix_list.s3.id]
   }
 
   tags = merge(var.tags, {
