@@ -4,7 +4,7 @@
 [![AWS](https://img.shields.io/badge/AWS-eu--west--1-FF9900?style=flat&logo=amazon-aws)](https://aws.amazon.com/)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 
-Enterprise-grade, multi-account AWS infrastructure for West Brom Building Society's digital banking platform. Built with Terraform following AWS Well-Architected Framework principles.
+Enterprise-grade, multi-account AWS infrastructure for digital banking platform. Built with Terraform following AWS Well-Architected Framework principles.
 
 ![Architecture Diagram](architectural-layout.png)
 

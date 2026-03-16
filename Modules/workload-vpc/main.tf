@@ -26,6 +26,13 @@ data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
 
+data "aws_prefix_list" "s3" {
+  filter {
+    name   = "prefix-list-name"
+    values = ["com.amazonaws.${data.aws_region.current.name}.s3"]
+  }
+}
+
 #====================================================================
 # VPC
 #====================================================================
@@ -230,11 +237,19 @@ resource "aws_security_group" "alb" {
   }
 
   egress {
-    description = "All outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTPS to targets"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
+  }
+
+  egress {
+    description = "HTTP to targets"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
   }
 
   tags = merge(var.tags, {
@@ -270,6 +285,32 @@ resource "aws_s3_bucket" "alb_logs" {
   tags = merge(var.tags, {
     Name = "${var.project_name}-${var.environment}-alb-logs"
   })
+}
+
+resource "aws_s3_bucket_public_access_block" "alb_logs" {
+  bucket = aws_s3_bucket.alb_logs.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "alb_logs" {
+  bucket = aws_s3_bucket.alb_logs.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_versioning" "alb_logs" {
+  bucket = aws_s3_bucket.alb_logs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 resource "aws_s3_bucket_policy" "alb_logs" {
@@ -397,11 +438,19 @@ resource "aws_security_group" "lambda" {
   vpc_id      = aws_vpc.workload.id
 
   egress {
-    description = "All outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTPS to VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
+  }
+
+  egress {
+    description = "S3 access"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    prefix_list_ids = [data.aws_prefix_list.s3.id]
   }
 
   tags = merge(var.tags, {
@@ -473,11 +522,19 @@ resource "aws_security_group" "msk" {
   }
 
   egress {
-    description = "All outbound"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    description = "Kafka internal"
+    from_port   = 9092
+    to_port     = 9098
+    protocol    = "tcp"
+    self        = true
+  }
+
+  egress {
+    description = "Zookeeper internal"
+    from_port   = 2181
+    to_port     = 2181
+    protocol    = "tcp"
+    self        = true
   }
 
   tags = merge(var.tags, {
@@ -584,11 +641,11 @@ resource "aws_security_group" "aurora" {
   }
 
   egress {
-    description = "All outbound"
+    description = "No outbound needed for RDS"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    self        = true
   }
 
   tags = merge(var.tags, {
@@ -644,6 +701,7 @@ resource "aws_rds_cluster" "aurora" {
   skip_final_snapshot             = false
   final_snapshot_identifier       = "${var.project_name}-${var.environment}-aurora-final-snapshot"
   enabled_cloudwatch_logs_exports = ["postgresql"]
+  iam_database_authentication_enabled = true
 
   tags = merge(var.tags, {
     Name = "${var.project_name}-${var.environment}-aurora-cluster"
@@ -684,11 +742,11 @@ resource "aws_security_group" "eks_nodes" {
   }
 
   egress {
-    description = "All outbound"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTPS to VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr, "10.0.0.0/8"]
   }
 
   tags = merge(var.tags, {
@@ -789,6 +847,29 @@ resource "aws_vpc_endpoint" "s3" {
   vpc_endpoint_type = "Gateway"
   route_table_ids   = concat([aws_route_table.public.id], aws_route_table.private[*].id)
 
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AllowVPCAccess"
+        Effect    = "Allow"
+        Principal = "*"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:DeleteObject"
+        ]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceVpc" = aws_vpc.workload.id
+          }
+        }
+      }
+    ]
+  })
+
   tags = merge(var.tags, {
     Name = "${var.project_name}-${var.environment}-workload-s3-endpoint"
   })
@@ -821,6 +902,24 @@ resource "aws_vpc_endpoint" "interface" {
   subnet_ids          = aws_subnet.private[*].id
   security_group_ids  = [aws_security_group.vpc_endpoints.id]
   private_dns_enabled = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AllowVPCAccess"
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "*"
+        Resource  = "*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceVpc" = aws_vpc.workload.id
+          }
+        }
+      }
+    ]
+  })
 
   tags = merge(var.tags, {
     Name = "${var.project_name}-${var.environment}-workload-${replace(each.value, ".", "-")}-endpoint"

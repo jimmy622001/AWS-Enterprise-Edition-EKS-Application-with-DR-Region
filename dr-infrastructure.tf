@@ -315,6 +315,7 @@ resource "aws_rds_cluster" "dr_workload" {
   skip_final_snapshot       = var.environment != "prod"
   final_snapshot_identifier = "${var.project_name}-${var.environment}-dr-final-${formatdate("YYYY-MM-DD-hhmm", timestamp())}"
   deletion_protection       = var.environment == "prod"
+  iam_database_authentication_enabled = true
 
   # No backup needed - this is a replica
   backup_retention_period = 1
@@ -430,6 +431,19 @@ resource "aws_s3_bucket_versioning" "dr_data" {
   versioning_configuration {
     status = "Enabled"
   }
+}
+
+resource "aws_s3_bucket_public_access_block" "dr_data" {
+  count = var.enable_dr ? 1 : 0
+
+  provider = aws.dr_workload
+
+  bucket = aws_s3_bucket.dr_data[0].id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "dr_data" {
