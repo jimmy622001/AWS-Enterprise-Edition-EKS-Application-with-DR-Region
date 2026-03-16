@@ -81,7 +81,7 @@ The Terraform execution role requires these AWS managed policies:
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/westbrom/aws-infrastructure.git
+git clone https://github.com/example-org/aws-infrastructure.git
 cd aws-infrastructure
 
 aws eks update-kubeconfig \
@@ -158,7 +158,7 @@ Deletion Protection	No      	Yes            	Yes	      Yes
 
 | Integration | Type | Connection Method | Purpose |
 |-------------|------|-------------------|----------|
-| **West Brom Colleagues** | Internal Users | Client VPN (Okta SAML) | Employee remote access |
+| **Example Colleagues** | Internal Users | Client VPN (Okta SAML) | Employee remote access |
 | **GoAnywhere** | File Transfer | Site-to-Site VPN | Secure file exchange |
 | **AWS Transfer Family** | External SFTP | SFTP Endpoint | External partner file transfers |
 

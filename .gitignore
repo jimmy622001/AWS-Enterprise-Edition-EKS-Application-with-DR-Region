@@ -49,3 +49,6 @@ terraform.rc
 *.log
 plan_output.txt
 validate_output.txt
+
+### CodeMie ###
+.codemie/
