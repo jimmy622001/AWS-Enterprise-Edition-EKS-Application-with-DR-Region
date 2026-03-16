@@ -296,7 +296,15 @@ resource "aws_security_group" "vpc_endpoints" {
   })
 }
 
-# S3 Gateway Endpoint
+# Data source for S3 prefix list
+data "aws_prefix_list" "s3" {
+  filter {
+    name   = "prefix-list-name"
+    values = ["com.amazonaws.${var.aws_region}.s3"]
+  }
+}
+
+# S3 Gateway Endpoint with Policy
 resource "aws_vpc_endpoint" "s3" {
   vpc_id            = aws_vpc.hub.id
   service_name      = "com.amazonaws.${var.aws_region}.s3"
@@ -306,12 +314,38 @@ resource "aws_vpc_endpoint" "s3" {
     aws_route_table.hub_private[*].id
   )
 
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AllowS3Access"
+        Effect    = "Allow"
+        Principal = "*"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:DeleteObject",
+          "s3:GetObjectVersion"
+        ]
+        Resource = [
+          "arn:aws:s3:::*"
+        ]
+        Condition = {
+          StringEquals = {
+            "aws:PrincipalAccount" = var.networking_account_id
+          }
+        }
+      }
+    ]
+  })
+
   tags = merge(local.hub_vpc_tags, {
     Name = "${local.name_prefix}-hub-s3-endpoint"
   })
 }
 
-# DynamoDB Gateway Endpoint
+# DynamoDB Gateway Endpoint with Policy
 resource "aws_vpc_endpoint" "dynamodb" {
   vpc_id            = aws_vpc.hub.id
   service_name      = "com.amazonaws.${var.aws_region}.dynamodb"
@@ -320,6 +354,35 @@ resource "aws_vpc_endpoint" "dynamodb" {
     [aws_route_table.hub_public.id],
     aws_route_table.hub_private[*].id
   )
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AllowDynamoDBAccess"
+        Effect    = "Allow"
+        Principal = "*"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:BatchGetItem",
+          "dynamodb:BatchWriteItem"
+        ]
+        Resource = [
+          "arn:aws:dynamodb:${var.aws_region}:${var.networking_account_id}:table/*"
+        ]
+        Condition = {
+          StringEquals = {
+            "aws:PrincipalAccount" = var.networking_account_id
+          }
+        }
+      }
+    ]
+  })
 
   tags = merge(local.hub_vpc_tags, {
     Name = "${local.name_prefix}-hub-dynamodb-endpoint"
@@ -354,6 +417,28 @@ resource "aws_vpc_endpoint" "interface" {
   subnet_ids          = aws_subnet.hub_private[*].id
   security_group_ids  = [aws_security_group.vpc_endpoints.id]
   private_dns_enabled = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AllowAll"
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "*"
+        Resource  = "*"
+        Condition = {
+          StringEquals = {
+            "aws:PrincipalAccount" = [
+              var.networking_account_id,
+              var.workload_account_id,
+              var.shared_services_account_id
+            ]
+          }
+        }
+      }
+    ]
+  })
 
   tags = merge(local.hub_vpc_tags, {
     Name = "${local.name_prefix}-hub-${each.value}-endpoint"
@@ -673,34 +758,82 @@ resource "aws_network_acl" "hub_private" {
   vpc_id     = aws_vpc.hub.id
   subnet_ids = aws_subnet.hub_private[*].id
 
-  # Allow inbound from internal networks
+  # Allow HTTPS from internal networks
   ingress {
-    protocol   = -1
+    protocol   = "tcp"
     rule_no    = 100
     action     = "allow"
     cidr_block = "10.0.0.0/8"
-    from_port  = 0
-    to_port    = 0
+    from_port  = 443
+    to_port    = 443
   }
-
-  # Allow inbound ephemeral ports
+  
+  # Allow DNS from internal networks
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 110
+    action     = "allow"
+    cidr_block = "10.0.0.0/8"
+    from_port  = 53
+    to_port    = 53
+  }
+  
+  ingress {
+    protocol   = "udp"
+    rule_no    = 120
+    action     = "allow"
+    cidr_block = "10.0.0.0/8"
+    from_port  = 53
+    to_port    = 53
+  }
+  
+  # Allow inbound ephemeral ports from internal networks only
   ingress {
     protocol   = "tcp"
     rule_no    = 200
     action     = "allow"
-    cidr_block = "0.0.0.0/0"
+    cidr_block = "10.0.0.0/8"
     from_port  = 1024
     to_port    = 65535
   }
 
-  # Allow all outbound
+  # Allow HTTPS outbound
   egress {
-    protocol   = -1
+    protocol   = "tcp"
     rule_no    = 100
     action     = "allow"
     cidr_block = "0.0.0.0/0"
-    from_port  = 0
-    to_port    = 0
+    from_port  = 443
+    to_port    = 443
+  }
+  
+  # Allow DNS outbound
+  egress {
+    protocol   = "tcp"
+    rule_no    = 110
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 53
+    to_port    = 53
+  }
+  
+  egress {
+    protocol   = "udp"
+    rule_no    = 120
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 53
+    to_port    = 53
+  }
+  
+  # Allow ephemeral ports for responses
+  egress {
+    protocol   = "tcp"
+    rule_no    = 200
+    action     = "allow"
+    cidr_block = "10.0.0.0/8"
+    from_port  = 1024
+    to_port    = 65535
   }
 
   tags = merge(local.hub_vpc_tags, {
