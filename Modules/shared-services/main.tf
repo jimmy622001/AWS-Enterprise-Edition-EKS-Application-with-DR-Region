@@ -248,11 +248,19 @@ resource "aws_security_group" "transfer" {
   }
 
   egress {
-    description = "All outbound"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTPS to VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr, "10.0.0.0/8"]
+  }
+
+  egress {
+    description = "S3 HTTPS"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    prefix_list_ids = [aws_vpc_endpoint.s3.prefix_list_id]
   }
 
   tags = merge(var.tags, {
@@ -704,11 +712,19 @@ resource "aws_security_group" "lambda" {
   vpc_id      = aws_vpc.shared_services.id
 
   egress {
-    description = "All outbound"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTPS to VPC endpoints"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
+  }
+
+  egress {
+    description = "S3 access via gateway endpoint"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    prefix_list_ids = [aws_vpc_endpoint.s3.prefix_list_id]
   }
 
   tags = merge(var.tags, {
@@ -822,11 +838,11 @@ resource "aws_security_group" "postgres" {
   }
 
   egress {
-    description = "All outbound"
+    description = "No outbound needed for RDS"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    self        = true
   }
 
   tags = merge(var.tags, {
@@ -883,6 +899,7 @@ resource "aws_db_instance" "postgres" {
   username                      = var.postgres_master_username
   manage_master_user_password   = true
   master_user_secret_kms_key_id = aws_kms_key.shared_services.arn
+  iam_database_authentication_enabled = true
 
   db_subnet_group_name   = aws_db_subnet_group.postgres.name
   vpc_security_group_ids = [aws_security_group.postgres.id]
@@ -1269,10 +1286,10 @@ resource "aws_s3_bucket_versioning" "crl" {
 resource "aws_s3_bucket_public_access_block" "crl" {
   bucket = aws_s3_bucket.crl.id
 
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_s3_bucket_policy" "crl" {
@@ -1336,6 +1353,30 @@ resource "aws_vpc_endpoint" "s3" {
   vpc_endpoint_type = "Gateway"
   route_table_ids   = [aws_route_table.private.id]
 
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowVPCAccess"
+        Effect = "Allow"
+        Principal = "*"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:DeleteObject",
+          "s3:GetObjectVersion"
+        ]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceVpc" = aws_vpc.shared_services.id
+          }
+        }
+      }
+    ]
+  })
+
   tags = merge(var.tags, {
     Name = "${var.project_name}-${var.environment}-shared-s3-endpoint"
   })
@@ -1365,6 +1406,24 @@ resource "aws_vpc_endpoint" "interface" {
   subnet_ids          = aws_subnet.private[*].id
   security_group_ids  = [aws_security_group.vpc_endpoints.id]
   private_dns_enabled = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AllowVPCAccess"
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "*"
+        Resource  = "*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceVpc" = aws_vpc.shared_services.id
+          }
+        }
+      }
+    ]
+  })
 
   tags = merge(var.tags, {
     Name = "${var.project_name}-${var.environment}-shared-${replace(each.value, ".", "-")}-endpoint"
