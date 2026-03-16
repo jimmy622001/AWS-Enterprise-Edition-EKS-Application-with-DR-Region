@@ -170,12 +170,12 @@ terraform apply tfplan-dr
 # Primary cluster
 aws rds describe-global-clusters \
   --region eu-west-1 \
-  --query 'GlobalClusters[?GlobalClusterIdentifier==`westbrom-prod-workload-global`]'
+  --query 'GlobalClusters[?GlobalClusterIdentifier==`example-prod-workload-global`]'
 
 # DR cluster
 aws rds describe-db-clusters \
   --region eu-west-2 \
-  --db-cluster-identifier westbrom-prod-dr-workload-cluster
+  --db-cluster-identifier example-prod-dr-workload-cluster
 ```
 
 **Expected:**
@@ -190,11 +190,11 @@ aws rds describe-db-clusters \
 ```bash
 # Check replication configuration
 aws s3api get-bucket-replication \
-  --bucket westbrom-prod-data-eu-west-1
+  --bucket example-prod-data-eu-west-1
 
 # Check replication status
 aws s3api head-object \
-  --bucket westbrom-prod-data-eu-west-1 \
+  --bucket example-prod-data-eu-west-1 \
   --key test-file.txt \
   --query 'ReplicationStatus'
 ```
@@ -208,7 +208,7 @@ aws s3api head-object \
 ```bash
 # List health checks
 aws route53 list-health-checks \
-  --query 'HealthChecks[?contains(CallerReference, `westbrom-prod`)].{Id:Id, Status:HealthCheckConfig.Type}'
+  --query 'HealthChecks[?contains(CallerReference, `example-prod`)].{Id:Id, Status:HealthCheckConfig.Type}'
 
 # Get health check status
 aws route53 get-health-check-status \
@@ -238,7 +238,7 @@ terraform state show aws_route53_health_check.primary_region[0]
 ```bash
 # Manually set alarm to ALARM state (test only!)
 aws cloudwatch set-alarm-state \
-  --alarm-name "westbrom-prod-primary-region-unhealthy" \
+  --alarm-name "example-prod-primary-region-unhealthy" \
   --state-value ALARM \
   --state-reason "Manual test" \
   --region eu-west-1
@@ -248,7 +248,7 @@ aws cloudwatch set-alarm-state \
 
 # Reset alarm
 aws cloudwatch set-alarm-state \
-  --alarm-name "westbrom-prod-primary-region-unhealthy" \
+  --alarm-name "example-prod-primary-region-unhealthy" \
   --state-value OK \
   --state-reason "Test complete" \
   --region eu-west-1
@@ -263,7 +263,7 @@ aws cloudwatch set-alarm-state \
 ```bash
 # DR Failover Notifications
 aws sns subscribe \
-  --topic-arn arn:aws:sns:eu-west-2:<account-id>:westbrom-prod-dr-failover-notifications \
+  --topic-arn arn:aws:sns:eu-west-2:<account-id>:example-prod-dr-failover-notifications \
   --protocol email \
   --notification-endpoint ops-team@example.com
 
@@ -275,7 +275,7 @@ aws sns subscribe \
 ```bash
 # Access DR monitoring dashboard
 aws cloudwatch get-dashboard \
-  --dashboard-name westbrom-prod-dr-monitoring \
+  --dashboard-name example-prod-dr-monitoring \
   --region eu-west-2
 ```
 
@@ -313,7 +313,7 @@ Add to calendar:
 aws cloudwatch get-metric-statistics \
   --namespace AWS/RDS \
   --metric-name AuroraGlobalDBReplicationLag \
-  --dimensions Name=DBClusterIdentifier,Value=westbrom-prod-dr-workload-cluster \
+  --dimensions Name=DBClusterIdentifier,Value=example-prod-dr-workload-cluster \
   --statistics Average \
   --start-time $(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%S) \
   --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
@@ -324,7 +324,7 @@ aws cloudwatch get-metric-statistics \
 aws cloudwatch get-metric-statistics \
   --namespace AWS/S3 \
   --metric-name ReplicationLatency \
-  --dimensions Name=SourceBucket,Value=westbrom-prod-data-eu-west-1 \
+  --dimensions Name=SourceBucket,Value=example-prod-data-eu-west-1 \
   --statistics Average \
   --start-time $(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%S) \
   --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
@@ -396,11 +396,11 @@ aws ce get-cost-and-usage \
 ```bash
 # Verify global cluster
 aws rds describe-global-clusters \
-  --global-cluster-identifier westbrom-prod-workload-global
+  --global-cluster-identifier example-prod-workload-global
 
 # Check DR cluster status
 aws rds describe-db-clusters \
-  --db-cluster-identifier westbrom-prod-dr-workload-cluster \
+  --db-cluster-identifier example-prod-dr-workload-cluster \
   --region eu-west-2
 ```
 
@@ -444,18 +444,18 @@ aws cloudwatch get-metric-statistics \
 **Check:**
 ```bash
 # View Lambda logs
-aws logs tail /aws/lambda/westbrom-prod-dr-scale-up \
+aws logs tail /aws/lambda/example-prod-dr-scale-up \
   --follow \
   --region eu-west-2
 
 # Check EventBridge rule
 aws events describe-rule \
-  --name westbrom-prod-dr-failover-trigger \
+  --name example-prod-dr-failover-trigger \
   --region eu-west-2
 
 # Verify targets
 aws events list-targets-by-rule \
-  --rule westbrom-prod-dr-failover-trigger \
+  --rule example-prod-dr-failover-trigger \
   --region eu-west-2
 ```
 
