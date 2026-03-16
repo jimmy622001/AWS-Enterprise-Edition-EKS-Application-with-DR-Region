@@ -1,0 +1,241 @@
+<mxfile host="app.diagrams.net" modified="2024-01-15T12:00:00.000Z" agent="CodeMie" version="22.1.0">
+  <diagram name="Primary Region - Ireland" id="primary-ireland">
+    <mxGraphModel dx="1434" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Title -->
+        <mxCell id="title" value="Primary Region: Ireland (eu-west-1)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="660" y="20" width="600" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- Subtitle -->
+        <mxCell id="subtitle" value="Full Production - All Features Enabled - ~850 Resources" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="660" y="60" width="600" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Region Border -->
+        <mxCell id="region" value="AWS Region: eu-west-1 (Ireland)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;verticalAlign=top;fontSize=16;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="120" width="1840" height="1240" as="geometry"/>
+        </mxCell>
+        
+        <!-- VPC 1: Hub VPC -->
+        <mxCell id="hub-vpc" value="Hub VPC (10.0.0.0/16)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalAlign=top;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="80" y="180" width="380" height="280" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="hub-tgw" value="Transit Gateway Attachments" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#146EB4;strokeColor=#0e4d80;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="110" y="230" width="320" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="hub-route53" value="Route 53 Resolver Endpoints" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#d79b00;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="110" y="310" width="320" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="hub-vpc-endpoints" value="VPC Endpoints (SSM, EC2, Logs)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#4A90E2;strokeColor=#2e5f91;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="110" y="390" width="320" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- VPC 2: Inspection VPC -->
+        <mxCell id="inspection-vpc" value="Inspection VPC (10.1.0.0/16)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalAlign=top;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="500" y="180" width="380" height="280" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="inspection-firewall" value="AWS Network Firewall" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DD344C;strokeColor=#b72841;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="530" y="230" width="320" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="inspection-rules" value="Firewall Rules and Policies" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#d77600;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="530" y="310" width="320" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="inspection-logs" value="Flow Logs to S3" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#569A31;strokeColor=#3d6e22;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="530" y="390" width="320" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- VPC 3: Workload VPC -->
+        <mxCell id="workload-vpc" value="Workload VPC (10.2.0.0/16)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalAlign=top;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="920" y="180" width="380" height="280" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="workload-eks" value="EKS Cluster (v1.28)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#d77600;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="950" y="230" width="320" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="workload-nodes" value="Node Groups (t3.large x 3-10)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#d77600;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="950" y="310" width="320" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="workload-apps" value="Application Workloads" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#d77600;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="950" y="390" width="320" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- VPC 4: Ingress VPC -->
+        <mxCell id="ingress-vpc" value="Ingress VPC (10.3.0.0/16)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalAlign=top;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1340" y="180" width="380" height="280" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="ingress-alb" value="Application Load Balancer" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#8C4FFF;strokeColor=#6c3ab7;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1370" y="230" width="320" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="ingress-apigw" value="API Gateway (REST + WebSocket)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF4F8B;strokeColor=#d73a6e;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1370" y="310" width="320" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="ingress-waf" value="WAF Rules" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DD344C;strokeColor=#b72841;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1370" y="390" width="320" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- VPC 5: Data VPC -->
+        <mxCell id="data-vpc" value="Data VPC (10.4.0.0/16)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalAlign=top;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="80" y="500" width="540" height="380" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="data-aurora" value="Aurora Global Database (Primary Writer)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#3B48CC;strokeColor=#2a3599;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="110" y="550" width="480" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="data-redshift" value="Redshift Cluster (dc2.large x 2)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#3B48CC;strokeColor=#2a3599;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="110" y="630" width="480" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="data-msk" value="MSK Kafka Cluster (kafka.m5.large x 3)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="110" y="710" width="480" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="data-opensearch" value="OpenSearch Domain (r6g.large x 3)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#4A90E2;strokeColor=#2e5f91;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="110" y="790" width="480" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- VPC 6: Shared Services VPC -->
+        <mxCell id="shared-vpc" value="Shared Services VPC (10.5.0.0/16)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalAlign=top;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="660" y="500" width="540" height="380" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="shared-airflow" value="MWAA - Managed Airflow (mw1.small)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#d77600;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="690" y="550" width="480" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="shared-monitoring" value="CloudWatch + Grafana" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF4F8B;strokeColor=#d73a6e;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="690" y="630" width="480" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="shared-bastion" value="Bastion Hosts (SSM)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#d77600;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="690" y="710" width="480" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="shared-secrets" value="Secrets Manager + Parameter Store" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DD344C;strokeColor=#b72841;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="690" y="790" width="480" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- VPC 7: Private Ingress VPC -->
+        <mxCell id="private-vpc" value="Private Ingress VPC (10.6.0.0/16)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalAlign=top;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1240" y="500" width="480" height="380" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="private-vpn" value="Client VPN Endpoint (if enabled)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DD344C;strokeColor=#b72841;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1270" y="550" width="420" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="private-okta" value="Okta SAML Integration" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#8C4FFF;strokeColor=#6c3ab7;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1270" y="630" width="420" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="private-dns" value="Private DNS Zones" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#d79b00;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1270" y="710" width="420" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="private-endpoints" value="Interface Endpoints" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#4A90E2;strokeColor=#2e5f91;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1270" y="790" width="420" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- Transit Gateway in center -->
+        <mxCell id="tgw" value="Transit Gateway&#xa;Central Hub&#xa;All VPCs Connected" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=3;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="810" y="920" width="240" height="120" as="geometry"/>
+        </mxCell>
+        
+        <!-- Global Services -->
+        <mxCell id="cloudfront" value="CloudFront Distribution" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#8C4FFF;strokeColor=#6c3ab7;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="80" y="920" width="280" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="route53" value="Route 53 Hosted Zones" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#d79b00;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="80" y="1000" width="280" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="waf-global" value="WAF Web ACL" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DD344C;strokeColor=#b72841;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="80" y="1080" width="280" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- Storage -->
+        <mxCell id="s3" value="S3 Buckets (CRR Enabled)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#569A31;strokeColor=#3d6e22;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1100" y="920" width="280" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="ecr" value="ECR Image Registry" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#d77600;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1100" y="1000" width="280" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="backup" value="AWS Backup Vault" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#7CB342;strokeColor=#558B2F;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1100" y="1080" width="280" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- Monitoring -->
+        <mxCell id="cloudwatch" value="CloudWatch Logs and Metrics" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF4F8B;strokeColor=#d73a6e;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1440" y="920" width="280" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="xray" value="X-Ray Tracing" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#d77600;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1440" y="1000" width="280" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="sns" value="SNS Notifications" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF4F8B;strokeColor=#d73a6e;fontColor=#ffffff;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1440" y="1080" width="280" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- Key Metrics -->
+        <mxCell id="metrics" value="📊 Key Metrics:&#xa;• Resources: ~850&#xa;• Monthly Cost: $3,000-$5,000&#xa;• Availability: 99.99%&#xa;• RTO to DR: &lt; 10 minutes&#xa;• RPO to DR: &lt; 1 second" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1976d2;strokeWidth=2;align=left;verticalAlign=top;fontSize=12;fontStyle=1;fontColor=#000000" vertex="1" parent="1" visible="1">
+          <mxGeometry x="80" y="1180" width="380" height="150" as="geometry"/>
+        </mxCell>
+        
+        <!-- Replication Info -->
+        <mxCell id="replication" value="🔄 Cross-Region Replication:&#xa;✅ Aurora Global Database to London&#xa;✅ S3 Cross-Region Replication&#xa;✅ ECR Image Replication&#xa;✅ DynamoDB Global Tables&#xa;✅ Continuous Async Replication" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff4e6;strokeColor=#ff9800;strokeWidth=2;align=left;verticalAlign=top;fontSize=12;fontStyle=1;fontColor=#000000" vertex="1" parent="1" visible="1">
+          <mxGeometry x="500" y="1180" width="540" height="150" as="geometry"/>
+        </mxCell>
+        
+        <!-- Health Status -->
+        <mxCell id="health" value="💚 Health Status:&#xa;🟢 PRIMARY ACTIVE&#xa;All services running&#xa;Serving production traffic&#xa;Replicating to DR region" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#4caf50;strokeWidth=2;align=left;verticalAlign=top;fontSize=12;fontStyle=1;fontColor=#000000" vertex="1" parent="1" visible="1">
+          <mxGeometry x="1080" y="1180" width="640" height="150" as="geometry"/>
+        </mxCell>
+        
+        <!-- Connection Lines -->
+        <mxCell id="line1" value="" style="endArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="hub-vpc" target="inspection-vpc">
+          <mxGeometry width="50" height="50" relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="line2" value="" style="endArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="inspection-vpc" target="workload-vpc">
+          <mxGeometry width="50" height="50" relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="line3" value="" style="endArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="workload-vpc" target="ingress-vpc">
+          <mxGeometry width="50" height="50" relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="line4" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="hub-vpc" target="tgw">
+          <mxGeometry width="50" height="50" relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="line5" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="workload-vpc" target="tgw">
+          <mxGeometry width="50" height="50" relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="line6" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="data-vpc" target="tgw">
+          <mxGeometry width="50" height="50" relative="1" as="geometry"/>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
