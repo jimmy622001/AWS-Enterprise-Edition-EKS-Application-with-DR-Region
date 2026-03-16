@@ -276,10 +276,18 @@ resource "aws_security_group" "alb" {
   }
 
   egress {
-    description = "All outbound to VPC"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    description = "HTTP to ECS tasks"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
+  }
+  
+  egress {
+    description = "HTTPS to ECS tasks"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = [var.vpc_cidr]
   }
 
@@ -649,10 +657,34 @@ resource "aws_security_group" "ecs_nginx" {
   }
 
   egress {
-    description = "All outbound"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    description = "HTTPS for API calls"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  
+  egress {
+    description = "HTTP to internal services"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/8"]
+  }
+  
+  egress {
+    description = "DNS TCP"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  
+  egress {
+    description = "DNS UDP"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -908,18 +940,58 @@ resource "aws_security_group" "vpc_endpoints" {
     protocol    = "tcp"
     cidr_blocks = [var.vpc_cidr]
   }
+  
+  egress {
+    description = "HTTPS responses"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
+  }
 
   tags = merge(var.tags, {
     Name = "${var.project_name}-${var.environment}-ingress-vpce-sg"
   })
 }
 
-# S3 Gateway Endpoint
+# Data source for S3 prefix list
+data "aws_prefix_list" "s3" {
+  filter {
+    name   = "prefix-list-name"
+    values = ["com.amazonaws.${data.aws_region.current.name}.s3"]
+  }
+}
+
+# S3 Gateway Endpoint with Policy
 resource "aws_vpc_endpoint" "s3" {
   vpc_id            = aws_vpc.ingress.id
   service_name      = "com.amazonaws.${data.aws_region.current.name}.s3"
   vpc_endpoint_type = "Gateway"
   route_table_ids   = concat([aws_route_table.public.id], aws_route_table.private[*].id)
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AllowS3Access"
+        Effect    = "Allow"
+        Principal = "*"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::*"
+        ]
+        Condition = {
+          StringEquals = {
+            "aws:PrincipalAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      }
+    ]
+  })
 
   tags = merge(var.tags, {
     Name = "${var.project_name}-${var.environment}-ingress-s3-endpoint"
@@ -949,6 +1021,24 @@ resource "aws_vpc_endpoint" "interface" {
   subnet_ids          = aws_subnet.private[*].id
   security_group_ids  = [aws_security_group.vpc_endpoints.id]
   private_dns_enabled = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AllowAll"
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "*"
+        Resource  = "*"
+        Condition = {
+          StringEquals = {
+            "aws:PrincipalAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      }
+    ]
+  })
 
   tags = merge(var.tags, {
     Name = "${var.project_name}-${var.environment}-ingress-${replace(each.value, ".", "-")}-endpoint"

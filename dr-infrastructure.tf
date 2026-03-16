@@ -311,6 +311,10 @@ resource "aws_rds_cluster" "dr_workload" {
   db_subnet_group_name = module.dr_data_vpc[0].db_subnet_group_name
   vpc_security_group_ids = [module.dr_data_vpc[0].aurora_security_group_id]
 
+  # Encryption
+  storage_encrypted = true
+  kms_key_id        = aws_kms_key.dr[0].arn
+
   # Pilot light - keep minimal
   skip_final_snapshot       = var.environment != "prod"
   final_snapshot_identifier = "${var.project_name}-${var.environment}-dr-final-${formatdate("YYYY-MM-DD-hhmm", timestamp())}"
