@@ -102,7 +102,7 @@ def handler(event, context):
 def scale_up_aurora(rds, environment, target_count, target_class):
     """Scale up Aurora cluster to production capacity"""
     
-    cluster_id = f"westbrom-{environment}-dr-workload-cluster"
+    cluster_id = f"example-{environment}-dr-workload-cluster"
     
     try:
         # Get current cluster status
@@ -168,7 +168,7 @@ def scale_up_eks(autoscaling, environment, target_nodes):
     
     try:
         # Find EKS node group auto scaling groups
-        asg_prefix = f"eks-westbrom-{environment}-dr"
+        asg_prefix = f"eks-example-{environment}-dr"
         
         response = autoscaling.describe_auto_scaling_groups()
         
@@ -218,7 +218,7 @@ def enable_dr_cloudfront(cloudfront, environment):
         
         dr_distribution_id = None
         for dist in response.get('DistributionList', {}).get('Items', []):
-            if f"westbrom-{environment}-dr-cloudfront" in dist.get('Comment', ''):
+            if f"example-{environment}-dr-cloudfront" in dist.get('Comment', ''):
                 dr_distribution_id = dist['Id']
                 break
         
@@ -271,7 +271,7 @@ def send_notifications(sns, environment, results):
     """Send DR activation notifications"""
     
     try:
-        topic_arn = f"arn:aws:sns:eu-west-2:{results.get('workload_account_id', '*')}:westbrom-{environment}-dr-failover-notifications"
+        topic_arn = f"arn:aws:sns:eu-west-2:{results.get('workload_account_id', '*')}:example-{environment}-dr-failover-notifications"
         
         message = f"""
 DISASTER RECOVERY FAILOVER ACTIVATED
@@ -314,7 +314,7 @@ def send_failure_notification(sns, environment, error_msg):
     """Send failure notification"""
     
     try:
-        topic_arn = f"arn:aws:sns:eu-west-2:*:westbrom-{environment}-dr-failover-notifications"
+        topic_arn = f"arn:aws:sns:eu-west-2:*:example-{environment}-dr-failover-notifications"
         
         sns.publish(
             TopicArn=topic_arn,

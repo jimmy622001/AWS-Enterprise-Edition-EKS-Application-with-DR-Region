@@ -327,13 +327,13 @@ terraform state list | Select-String "dr_"
 ```bash
 # Trigger alarm manually
 aws cloudwatch set-alarm-state \
-  --alarm-name "westbrom-prod-primary-region-unhealthy" \
+  --alarm-name "example-prod-primary-region-unhealthy" \
   --state-value ALARM \
   --state-reason "Manual DR test" \
   --region eu-west-1
 
 # Monitor Lambda execution
-aws logs tail /aws/lambda/westbrom-prod-dr-scale-up --follow --region eu-west-2
+aws logs tail /aws/lambda/example-prod-dr-scale-up --follow --region eu-west-2
 
 # Verify DR resources scaled up
 aws rds describe-db-clusters --region eu-west-2
@@ -341,7 +341,7 @@ aws autoscaling describe-auto-scaling-groups --region eu-west-2
 
 # Reset alarm
 aws cloudwatch set-alarm-state \
-  --alarm-name "westbrom-prod-primary-region-unhealthy" \
+  --alarm-name "example-prod-primary-region-unhealthy" \
   --state-value OK \
   --state-reason "Test complete" \
   --region eu-west-1

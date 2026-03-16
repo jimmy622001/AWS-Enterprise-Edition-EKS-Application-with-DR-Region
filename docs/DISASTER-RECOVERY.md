@@ -419,15 +419,15 @@ aws eks describe-cluster --name <cluster-name> --region eu-west-1
 ```bash
 # Scale Aurora to production capacity
 aws rds modify-db-cluster \
-  --db-cluster-identifier westbrom-prod-dr-workload-cluster \
+  --db-cluster-identifier example-prod-dr-workload-cluster \
   --apply-immediately \
   --region eu-west-2
 
 # Add additional Aurora instances
 for i in {2..3}; do
   aws rds create-db-instance \
-    --db-instance-identifier westbrom-prod-dr-workload-$i \
-    --db-cluster-identifier westbrom-prod-dr-workload-cluster \
+    --db-instance-identifier example-prod-dr-workload-$i \
+    --db-cluster-identifier example-prod-dr-workload-cluster \
     --db-instance-class db.r6g.xlarge \
     --engine aurora-postgresql \
     --region eu-west-2
@@ -547,7 +547,7 @@ aws autoscaling set-desired-capacity \
 
 # Scale Aurora to single instance
 aws rds delete-db-instance \
-  --db-instance-identifier westbrom-prod-dr-workload-2 \
+  --db-instance-identifier example-prod-dr-workload-2 \
   --skip-final-snapshot \
   --region eu-west-2
 
@@ -704,11 +704,11 @@ aws rds modify-db-instance \
 
 ```bash
 # View Lambda logs
-aws logs tail /aws/lambda/westbrom-prod-dr-scale-up --follow
+aws logs tail /aws/lambda/example-prod-dr-scale-up --follow
 
 # Manual invocation for testing
 aws lambda invoke \
-  --function-name westbrom-prod-dr-scale-up \
+  --function-name example-prod-dr-scale-up \
   --payload '{"test": true}' \
   output.json
 ```

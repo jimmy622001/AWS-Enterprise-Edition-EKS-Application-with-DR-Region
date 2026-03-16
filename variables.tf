@@ -173,7 +173,7 @@ variable "enable_airflow" {
 #====================================================================
 
 variable "project_name" {
-  description = "Project name for resource naming (e.g., westbrom)"
+  description = "Project name for resource naming (e.g., example)"
   type        = string
 
   validation {
