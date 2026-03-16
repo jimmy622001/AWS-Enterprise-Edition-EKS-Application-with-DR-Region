@@ -992,6 +992,7 @@ resource "aws_api_gateway_method" "proxy" {
   resource_id   = aws_api_gateway_resource.proxy.id
   http_method   = "ANY"
   authorization = "NONE"
+  api_key_required = true  # Require API key for additional security
 
   request_parameters = {
     "method.request.path.proxy" = true
@@ -1134,6 +1135,46 @@ resource "aws_iam_role" "api_gateway_cloudwatch" {
 resource "aws_iam_role_policy_attachment" "api_gateway_cloudwatch" {
   role       = aws_iam_role.api_gateway_cloudwatch.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+}
+
+# API Gateway API Key
+resource "aws_api_gateway_api_key" "main" {
+  name    = "${var.project_name}-${var.environment}-cloudfront-api-key"
+  enabled = true
+
+  tags = merge(var.tags, {
+    Name = "${var.project_name}-${var.environment}-cloudfront-api-key"
+  })
+}
+
+# API Gateway Usage Plan
+resource "aws_api_gateway_usage_plan" "main" {
+  name        = "${var.project_name}-${var.environment}-usage-plan"
+  description = "Usage plan for CloudFront to API Gateway"
+
+  api_stages {
+    api_id = aws_api_gateway_rest_api.main.id
+    stage  = aws_api_gateway_stage.main.stage_name
+  }
+
+  throttle_settings {
+    burst_limit = 5000
+    rate_limit  = 10000
+  }
+
+  quota_settings {
+    limit  = 1000000
+    period = "DAY"
+  }
+
+  tags = var.tags
+}
+
+# Associate API Key with Usage Plan
+resource "aws_api_gateway_usage_plan_key" "main" {
+  key_id        = aws_api_gateway_api_key.main.id
+  key_type      = "API_KEY"
+  usage_plan_id = aws_api_gateway_usage_plan.main.id
 }
 
 # API Gateway Custom Domain (Optional)
