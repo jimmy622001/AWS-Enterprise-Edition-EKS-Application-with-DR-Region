@@ -153,7 +153,7 @@ aws-enterprise-eks-architecture/
 ├── 📄 outputs.tf                     # Output definitions
 │
 ├── 📄 dev.tfvars                     # Dev environment
-├── 📄 uat.tfvars                     # UAT environment
+├── 📄 poc.tfvars                     # POC environment
 ├── 📄 staging.tfvars                 # Staging environment
 ├── 📄 prod.tfvars                    # Production environment
 │
@@ -172,19 +172,20 @@ This repository uses **branch-based environment management**:
 
 | Branch | Purpose | Region | Environment |
 |--------|---------|--------|-------------|
-| **`main`** | Production-ready stable code | - | Default |
-| **`dev`** | Development configurations | eu-west-1 | Development |
-| **`uat`** | User Acceptance Testing | eu-west-1 | UAT |
+| **`main`** | Production (stable, production-ready) | eu-west-1 | Production (Ireland) |
 | **`staging`** | Pre-production testing | eu-west-1 | Staging |
-| **`prod`** | Production environment | eu-west-1 | Production (Primary) |
-| **`dr-london`** | Disaster Recovery | eu-west-2 | DR (Secondary) |
+| **`poc`** | Proof of Concept (experimental) | eu-west-1 | POC |
+| **`dev`** | Active development | eu-west-1 | Development |
+| **`dr-london`** | Disaster Recovery (passive standby) | eu-west-2 | DR (London) |
 
-### Workflow:
+### Deployment Flow:
 ```
-dev → uat → staging → prod
-                    ↓
-                dr-london (sync)
+dev → poc → staging → main (Production)
+                        ↓
+                  dr-london (auto-sync)
 ```
+
+> 📘 **See [`BRANCH-STRATEGY.md`](BRANCH-STRATEGY.md) for complete branch management guidelines**
 
 ---
 
