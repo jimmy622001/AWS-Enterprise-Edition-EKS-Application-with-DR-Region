@@ -313,6 +313,15 @@ resource "aws_s3_bucket_versioning" "alb_logs" {
   }
 }
 
+resource "aws_s3_bucket_logging" "alb_logs" {
+  count = var.access_logs_bucket_name != "" ? 1 : 0
+
+  bucket = aws_s3_bucket.alb_logs.id
+
+  target_bucket = var.access_logs_bucket_name
+  target_prefix = "alb-logs-bucket/"
+}
+
 resource "aws_s3_bucket_policy" "alb_logs" {
   bucket = aws_s3_bucket.alb_logs.id
   policy = jsonencode({

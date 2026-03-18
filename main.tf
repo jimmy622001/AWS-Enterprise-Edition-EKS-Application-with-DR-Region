@@ -237,6 +237,9 @@ module "workload_vpc" {
   aurora_database_name   = var.aurora_database_name
   aurora_master_username = var.aurora_master_username
 
+  # S3 Access Logging
+  access_logs_bucket_name = module.shared_services.access_logs_bucket_name
+
   tags = local.common_tags
 }
 
