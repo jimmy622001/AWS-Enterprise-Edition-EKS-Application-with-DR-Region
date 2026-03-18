@@ -97,3 +97,13 @@ variable "api_throttling_rate_limit" {
   type        = number
   default     = 10000
 }
+
+#====================================================================
+# S3 LOGGING CONFIGURATION
+#====================================================================
+
+variable "access_logs_bucket_name" {
+  description = "Central S3 access logs bucket name"
+  type        = string
+  default     = ""
+}

@@ -114,6 +114,16 @@ output "alerts_topic_arn" {
 }
 
 # S3 Outputs
+output "access_logs_bucket_arn" {
+  description = "Central S3 access logs bucket ARN"
+  value       = aws_s3_bucket.access_logs.arn
+}
+
+output "access_logs_bucket_name" {
+  description = "Central S3 access logs bucket name"
+  value       = aws_s3_bucket.access_logs.id
+}
+
 output "shared_data_bucket_arn" {
   description = "Shared data S3 bucket ARN"
   value       = aws_s3_bucket.shared_data.arn
