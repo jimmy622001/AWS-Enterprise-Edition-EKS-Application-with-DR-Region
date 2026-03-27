@@ -24,6 +24,7 @@ This repository contains a complete **AWS enterprise architecture** with **EKS (
 - [Security](#-security)
 - [Monitoring & Observability](#-monitoring--observability)
 - [Cost Optimization](#-cost-optimization)
+- [Well-Architected Alignment](#-well-architected-alignment)
 - [Contributing](#-contributing)
 
 ---

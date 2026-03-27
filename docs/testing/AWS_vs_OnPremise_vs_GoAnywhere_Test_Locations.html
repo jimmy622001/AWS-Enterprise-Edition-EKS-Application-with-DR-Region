@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Location Matrix: AWS to On-Premise to Go Anywhere</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            border-bottom: 4px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            margin-top: 35px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-left: 5px solid #3498db;
+            padding-left: 15px;
+        }
+        
+        h3 {
+            color: #34495e;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        h4 {
+            color: #555;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        
+        hr {
+            border: none;
+            border-top: 2px solid #ecf0f1;
+            margin: 30px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        table thead tr {
+            background-color: #3498db;
+            color: white;
+            text-align: left;
+        }
+        
+        table th,
+        table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+        }
+        
+        table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+        
+        table tbody tr:nth-of-type(even) {
+            background-color: #f8f9fa;
+        }
+        
+        table tbody tr:hover {
+            background-color: #e3f2fd;
+        }
+        
+        .architecture-box {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        
+        .section-icon {
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        
+        .alert-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .error-box {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .info-box {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .legend {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .legend-item {
+            display: inline-block;
+            margin-right: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .contact-table {
+            background: #f8f9fa;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                padding: 20px;
+            }
+            
+            table {
+                page-break-inside: auto;
+            }
+            
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+            
+            h2 {
+                page-break-after: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Location Matrix: AWS to On-Premise to Go Anywhere</h1>
+        <p class="subtitle">File Transfer Testing - Clear Test Location Assignments</p>
+        
+        <hr>
+        
+        <h2><span class="section-icon">📋</span>Architecture Overview</h2>
+        
+        <div class="architecture-box">┌──────────────────────────────────────────────────────────────┐
+│                    AWS BANKING APPLICATION                   │
+│                         (SOURCE)                             │
+│                                                              │
+│  • Daily file generation                                     │
+│  • S3 landing buckets                                        │
+│  • Anti-malware scanning                                     │
+│  • File validation                                           │
+└────────────────────┬─────────────────────────────────────────┘
+                     │
+                     │ AWS Transfer Family SFTP
+                     │
+                     ▼
+┌──────────────────────────────────────────────────────────────┐
+│              GO ANYWHERE MFT PLATFORM                        │
+│           (FILE TRANSFER ORCHESTRATION)                      │
+│                                                              │
+│  • SolarWinds Monitoring & Notifications                     │
+│  • File transfer workflow management                         │
+│  • Encryption/Decryption                                     │
+│  • Error handling & retry logic                              │
+│  • Audit logging                                             │
+└────────────────────┬─────────────────────────────────────────┘
+                     │
+                     │ Site-to-Site VPN 
+                     │
+                     ▼
+┌──────────────────────────────────────────────────────────────┐
+│                 ON-PREMISE FILE SERVERS                      │
+│                     (DESTINATION)                            │
+│                                                              │
+│  • \\&lt;FILE_SERVER&gt;\file_transfer\NBS                         │
+│  • BMC Control-M Jobs                                        │
+│  • File processing & reformatting                            │
+│  • Staging area management                                   │
+└────────────────────┬─────────────────────────────────────────┘
+                     │
+                     │ SFTP via Go Anywhere
+                     │
+                     ▼
+┌──────────────────────────────────────────────────────────────┐
+│               GO ANYWHERE CLOUD STORAGE                      │
+│                                                              │
+│  • Intermediate storage                                      │
+│  • SolarWinds monitoring                                     │
+└────────────────────┬─────────────────────────────────────────┘
+                     │
+                     │ Final SFTP Transfer
+                     │
+                     ▼
+┌──────────────────────────────────────────────────────────────┐
+│                  UNIT4 AGRESSO CLOUD                         │
+│                   (FINAL DESTINATION)                        │
+│                                                              │
+│  • &lt;AGRESSO_SFTP_HOST&gt;                                       │
+│  • \\Server location\uk_xxx_prod$\Data Import                │
+└──────────────────────────────────────────────────────────────┘</div>
+        
+        <hr>
+        
+        <h2><span class="section-icon">🎯</span>Test Location Decision Matrix</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Test Scenario</th>
+                    <th>Primary Test Location</th>
+                    <th>Secondary Location</th>
+                    <th>Monitoring Tool</th>
+                    <th>Who Performs Test</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>1. File Generation in AWS</strong></td>
+                    <td>✅ AWS Side</td>
+                    <td>-</td>
+                    <td>CloudWatch, Lambda Logs</td>
+                    <td>AWS Team</td>
+                </tr>
+                <tr>
+                    <td><strong>2. File Upload to MFT</strong></td>
+                    <td>✅ AWS Side</td>
+                    <td>Go Anywhere Platform</td>
+                    <td>Go Anywhere Logs, SolarWinds</td>
+                    <td>AWS Team + MFT Team</td>
+                </tr>
+                <tr>
+                    <td><strong>3. Anti-Malware Scanning</strong></td>
+                    <td>✅ AWS Side</td>
+                    <td>Go Anywhere (if MFT has AV)</td>
+                    <td>CloudWatch, SolarWinds</td>
+                    <td>AWS Team</td>
+                </tr>
+                <tr>
+                    <td><strong>4. File Encryption</strong></td>
+                    <td>✅ Go Anywhere Platform</td>
+                    <td>AWS (if done pre-transfer)</td>
+                    <td>Go Anywhere Logs, SolarWinds</td>
+                    <td>MFT Team</td>
+                </tr>
+                <tr>
+                    <td><strong>5. File Transfer to On-Prem</strong></td>
+                    <td>✅ Go Anywhere Platform</td>
+                    <td>On-Premise (reception)</td>
+                    <td>SolarWinds, BMC Control-M</td>
+                    <td>MFT Team + On-Prem Team</td>
+                </tr>
+                <tr>
+                    <td><strong>6. File Decryption</strong></td>
+                    <td>✅ On-Premise Side</td>
+                    <td>Go Anywhere (if done at MFT)</td>
+                    <td>BMC Control-M, Windows Event Logs</td>
+                    <td>On-Prem Team</td>
+                </tr>
+                <tr>
+                    <td><strong>7. Virus Scanning</strong></td>
+                    <td>✅ AWS Side</td>
+                    <td>-</td>
+                    <td>On-Premise Antivirus, Control-M</td>
+                    <td>On-Prem Team</td>
+                </tr>
+                <tr>
+                    <td><strong>8. File Reception Validation</strong></td>
+                    <td>✅ On-Premise Side</td>
+                    <td>-</td>
+                    <td>BMC Control-M, PowerShell Scripts</td>
+                    <td>On-Prem Team</td>
+                </tr>
+                <tr>
+                    <td><strong>9. BMC Control-M Processing</strong></td>
+                    <td>✅ On-Premise Side</td>
+                    <td>-</td>
+                    <td>BMC Control-M Dashboard</td>
+                    <td>On-Prem Team</td>
+                </tr>
+                <tr>
+                    <td><strong>10. File Reformatting</strong></td>
+                    <td>✅ On-Premise Side</td>
+                    <td>-</td>
+                    <td>BMC Control-M Jobs</td>
+                    <td>On-Prem Team</td>
+                </tr>
+                <tr>
+                    <td><strong>11. SFTP to Go Anywhere Cloud</strong></td>
+                    <td>✅ On-Premise Side</td>
+                    <td>Go Anywhere Cloud</td>
+                    <td>SolarWinds, Control-M</td>
+                    <td>On-Prem Team + MFT Team</td>
+                </tr>
+                <tr>
+                    <td><strong>12. Go Anywhere Cloud Storage</strong></td>
+                    <td>✅ Go Anywhere Cloud</td>
+                    <td>-</td>
+                    <td>SolarWinds</td>
+                    <td>MFT Team</td>
+                </tr>
+                <tr>
+                    <td><strong>13. Final Transfer to Agresso</strong></td>
+                    <td>✅ Go Anywhere Cloud</td>
+                    <td>Agresso (reception)</td>
+                    <td>SolarWinds, Agresso Logs</td>
+                    <td>MFT Team + Agresso Team</td>
+                </tr>
+                <tr>
+                    <td><strong>14. MFT Agent/Platform Down</strong></td>
+                    <td>✅ Go Anywhere Platform</td>
+                    <td>AWS & On-Premise</td>
+                    <td>SolarWinds Alerts</td>
+                    <td>MFT Team</td>
+                </tr>
+                <tr>
+                    <td><strong>15. Internet/VPN Down</strong></td>
+                    <td>✅ Both AWS & On-Premise</td>
+                    <td>Network Infrastructure</td>
+                    <td>AWS CloudWatch, SolarWinds</td>
+                    <td>Network Team</td>
+                </tr>
+                <tr>
+                    <td><strong>16. File Recovery from Backup</strong></td>
+                    <td>✅ All Three</td>
+                    <td>Depends on recovery source</td>
+                    <td>Backup software, S3 Versioning</td>
+                    <td>Respective Teams</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <hr>
+        
+        <h2><span class="section-icon">📊</span>Detailed Test Breakdown by Location</h2>
+        
+        <h3><span class="section-icon">🔵</span>Tests to Perform on AWS Side</h3>
+        
+        <h4>Test Group A: File Generation & Initial Validation</h4>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Test Name</th>
+                    <th>What to Test</th>
+                    <th>Success Criteria</th>
+                    <th>Monitoring</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>AWS-001</strong></td>
+                    <td>Daily file generation</td>
+                    <td>Banking app generates files in S3 landing bucket</td>
+                    <td>Files present with correct naming convention</td>
+                    <td>CloudWatch Events, S3 Event Notifications</td>
+                </tr>
+                <tr>
+                    <td><strong>AWS-002</strong></td>
+                    <td>File naming convention</td>
+                    <td>Files follow pattern: &lt;FileType&gt;_YYYYMMDD.&lt;ext&gt;</td>
+                    <td>All files match naming standard</td>
+                    <td>Lambda validation function</td>
+                </tr>
+                <tr>
+                    <td><strong>AWS-003</strong></td>
+                    <td>File completeness</td>
+                    <td>File size > 0 bytes, expected columns present</td>
+                    <td>Size check passes, schema validation passes</td>
+                    <td>Lambda metadata check</td>
+                </tr>
+                <tr>
+                    <td><strong>AWS-004</strong></td>
+                    <td>Multiple file types</td>
+                    <td>.xlsx, .csv, .html files generated correctly</td>
+                    <td>Each format parses successfully</td>
+                    <td>Lambda parser tests</td>
+                </tr>
+                <tr>
+                    <td><strong>AWS-005</strong></td>
+                    <td>Timestamp accuracy</td>
+                    <td>File creation timestamp matches expected schedule</td>
+                    <td>Files created within ±5 min of schedule</td>
+                    <td>CloudWatch metric</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>Test Group B: Security & Anti-Malware</h4>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Test Name</th>
+                    <th>What to Test</th>
+                    <th>Success Criteria</th>
+                    <th>Monitoring</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>AWS-006</strong></td>
+                    <td>Clean file scanning</td>
+                    <td>Clean files pass AV scan and continue transfer</td>
+                    <td>File remains in landing bucket</td>
+                    <td>Lambda AV function logs</td>
+                </tr>
+                <tr>
+                    <td><strong>AWS-007</strong></td>
+                    <td>Malware detection (EICAR)</td>
+                    <td>EICAR test file triggers quarantine</td>
+                    <td>File moved to quarantine bucket</td>
+                    <td>CloudWatch alarm, SNS alert</td>
+                </tr>
+                <tr>
+                    <td><strong>AWS-008</strong></td>
+                    <td>Quarantine isolation</td>
+                    <td>Infected files isolated and not transferred</td>
+                    <td>No infected files reach MFT</td>
+                    <td>S3 bucket policies enforce isolation</td>
+                </tr>
+                <tr>
+                    <td><strong>AWS-009</strong></td>
+                    <td>Scan performance</td>
+                    <td>Scan completes in < 5 sec for 10MB file</td>
+                    <td>95th percentile < 5 sec</td>
+                    <td>CloudWatch metrics</td>
+                </tr>
+                <tr>
+                    <td><strong>AWS-010</strong></td>
+                    <td>SNS alert delivery</td>
+                    <td>Malware alert delivered within 30 sec</td>
+                    <td>Alert received by ops team</td>
+                    <td>SNS delivery logs</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>Test Group C: File Integrity & Validation</h4>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Test Name</th>
+                    <th>What to Test</th>
+                    <th>Success Criteria</th>
+                    <th>Monitoring</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>AWS-011</strong></td>
+                    <td>MD5 checksum calculation</td>
+                    <td>Checksum calculated and stored as metadata</td>
+                    <td>Metadata present on S3 object</td>
+                    <td>S3 object metadata</td>
+                </tr>
+                <tr>
+                    <td><strong>AWS-012</strong></td>
+                    <td>File size validation</td>
+                    <td>Size matches expected range</td>
+                    <td>File within ±20% of average size</td>
+                    <td>Lambda validation</td>
+                </tr>
+                <tr>
+                    <td><strong>AWS-013</strong></td>
+                    <td>Format validation (XLSX)</td>
+                    <td>Excel files parse without errors</td>
+                    <td>openpyxl successfully reads file</td>
+                    <td>Lambda logs</td>
+                </tr>
+                <tr>
+                    <td><strong>AWS-014</strong></td>
+                    <td>Format validation (CSV)</td>
+                    <td>CSV files have correct delimiter and encoding</td>
+                    <td>csv.reader parses successfully</td>
+                    <td>Lambda logs</td>
+                </tr>
+                <tr>
+                    <td><strong>AWS-015</strong></td>
+                    <td>Encoding verification</td>
+                    <td>Files in UTF-8 encoding</td>
+                    <td>Character set validation passes</td>
+                    <td>Lambda validation</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>Test Group D: File Transfer to MFT</h4>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Test Name</th>
+                    <th>What to Test</th>
+                    <th>Success Criteria</th>
+                    <th>Monitoring</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>AWS-016</strong></td>
+                    <td>MFT connection establishment</td>
+                    <td>AWS can connect to Go Anywhere MFT</td>
+                    <td>Connection established < 5 sec</td>
+                    <td>CloudWatch Logs</td>
+                </tr>
+                <tr>
+                    <td><strong>AWS-017</strong></td>
+                    <td>Authentication success</td>
+                    <td>SSH key or credentials validated</td>
+                    <td>Auth succeeds</td>
+                    <td>Transfer logs</td>
+                </tr>
+                <tr>
+                    <td><strong>AWS-018</strong></td>
+                    <td>File upload initiation</td>
+                    <td>File transfer starts successfully</td>
+                    <td>Transfer begins</td>
+                    <td>CloudWatch Events</td>
+                </tr>
+                <tr>
+                    <td><strong>AWS-019</strong></td>
+                    <td>Upload bandwidth</td>
+                    <td>Upload speed meets SLA (e.g., > 10 Mbps)</td>
+                    <td>Speed measured and logged</td>
+                    <td>Custom metric</td>
+                </tr>
+                <tr>
+                    <td><strong>AWS-020</strong></td>
+                    <td>Concurrent uploads</td>
+                    <td>Multiple files upload simultaneously</td>
+                    <td>No failures under load</td>
+                    <td>Load test results</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <hr>
+        
+        <h3><span class="section-icon">🟢</span>Tests to Perform on Go Anywhere MFT Platform</h3>
+        
+        <h4>Test Group E: File Reception & Orchestration</h4>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Test Name</th>
+                    <th>What to Test</th>
+                    <th>Success Criteria</th>
+                    <th>Monitoring</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>MFT-001</strong></td>
+                    <td>File reception from AWS</td>
+                    <td>MFT receives files from AWS successfully</td>
+                    <td>File present in MFT landing zone</td>
+                    <td>Go Anywhere logs, SolarWinds dashboard</td>
+                </tr>
+                <tr>
+                    <td><strong>MFT-002</strong></td>
+                    <td>File integrity check</td>
+                    <td>MFT validates MD5 checksum</td>
+                    <td>Checksum matches source</td>
+                    <td>Go Anywhere workflow logs</td>
+                </tr>
+                <tr>
+                    <td><strong>MFT-003</strong></td>
+                    <td>SolarWinds notification</td>
+                    <td>Alert sent when file received</td>
+                    <td>Notification delivered < 1 min</td>
+                    <td>SolarWinds alert log</td>
+                </tr>
+                <tr>
+                    <td><strong>MFT-004</strong></td>
+                    <td>Workflow triggering</td>
+                    <td>File reception triggers processing workflow</td>
+                    <td>Workflow executes automatically</td>
+                    <td>Go Anywhere workflow status</td>
+                </tr>
+                <tr>
+                    <td><strong>MFT-005</strong></td>
+                    <td>File queuing</td>
+                    <td>Files queue properly during high volume</td>
+                    <td>No files dropped</td>
+                    <td>Go Anywhere queue metrics</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>Test Group F: Encryption & Security</h4>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Test Name</th>
+                    <th>What to Test</th>
+                    <th>Success Criteria</th>
+                    <th>Monitoring</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>MFT-006</strong></td>
+                    <td>Encryption (if applicable)</td>
+                    <td>File encrypted before transfer to on-prem</td>
+                    <td>Encrypted file created</td>
+                    <td>Go Anywhere logs</td>
+                </tr>
+                <tr>
+                    <td><strong>MFT-007</strong></td>
+                    <td>Encryption key management</td>
+                    <td>Correct keys used for encryption</td>
+                    <td>No key errors</td>
+                    <td>Go Anywhere security logs</td>
+                </tr>
+                <tr>
+                    <td><strong>MFT-008</strong></td>
+                    <td>TLS/SSL validation</td>
+                    <td>Transfer uses TLS 1.2+</td>
+                    <td>SSL certificate valid</td>
+                    <td>Network packet capture</td>
+                </tr>
+                <tr>
+                    <td><strong>MFT-009</strong></td>
+                    <td>Access control</td>
+                    <td>Only authorized systems can retrieve files</td>
+                    <td>Unauthorized access denied</td>
+                    <td>Go Anywhere audit log</td>
+                </tr>
+                <tr>
+                    <td><strong>MFT-010</strong></td>
+                    <td>File retention policy</td>
+                    <td>Files deleted after successful transfer</td>
+                    <td>Old files cleaned up</td>
+                    <td>Go Anywhere retention logs</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>Test Group G: Error Handling & Retry Logic</h4>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Test Name</th>
+                    <th>What to Test</th>
+                    <th>Success Criteria</th>
+                    <th>Monitoring</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>MFT-011</strong></td>
+                    <td>Network interruption handling</td>
+                    <td>MFT retries after network failure</td>
+                    <td>Transfer resumes after reconnect</td>
+                    <td>Go Anywhere retry logs</td>
+                </tr>
+                <tr>
+                    <td><strong>MFT-012</strong></td>
+                    <td>Failed transfer retry</td>
+                    <td>Failed transfers retry up to 3 times</td>
+                    <td>Retry count = 3, then alert</td>
+                    <td>SolarWinds alert</td>
+                </tr>
+                <tr>
+                    <td><strong>MFT-013</strong></td>
+                    <td>Exponential backoff</td>
+                    <td>Retry delay increases: 1min, 2min, 4min</td>
+                    <td>Timing verified in logs</td>
+                    <td>Go Anywhere workflow logs</td>
+                </tr>
+                <tr>
+                    <td><strong>MFT-014</strong></td>
+                    <td>Dead letter queue</td>
+                    <td>Failed files moved to error queue</td>
+                    <td>File in DLQ after max retries</td>
+                    <td>Go Anywhere error queue</td>
+                </tr>
+                <tr>
+                    <td><strong>MFT-015</strong></td>
+                    <td>Alert escalation</td>
+                    <td>Critical failures escalate to on-call</td>
+                    <td>PagerDuty/SMS received</td>
+                    <td>SolarWinds escalation log</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>Test Group H: Transfer to On-Premise</h4>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Test Name</th>
+                    <th>What to Test</th>
+                    <th>Success Criteria</th>
+                    <th>Monitoring</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>MFT-016</strong></td>
+                    <td>VPN connectivity check</td>
+                    <td>MFT can reach on-prem via VPN</td>
+                    <td>Ping/traceroute succeeds</td>
+                    <td>SolarWinds network monitor</td>
+                </tr>
+                <tr>
+                    <td><strong>MFT-017</strong></td>
+                    <td>File push to on-prem</td>
+                    <td>Files transferred to \\&lt;FILE_SERVER&gt;</td>
+                    <td>File present on file server</td>
+                    <td>Go Anywhere transfer log</td>
+                </tr>
+                <tr>
+                    <td><strong>MFT-018</strong></td>
+                    <td>Transfer completion notification</td>
+                    <td>Notification sent after successful transfer</td>
+                    <td>Alert received < 1 min</td>
+                    <td>SolarWinds notification</td>
+                </tr>
+                <tr>
+                    <td><strong>MFT-019</strong></td>
+                    <td>Large file handling</td>
+                    <td>100MB+ files transfer without timeout</td>
+                    <td>Transfer completes</td>
+                    <td>Go Anywhere logs</td>
+                </tr>
+                <tr>
+                    <td><strong>MFT-020</strong></td>
+                    <td>Bandwidth throttling</td>
+                    <td>Transfer doesn't saturate VPN bandwidth</td>
+                    <td>< 80% bandwidth used</td>
+                    <td>Network monitoring</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <hr>
+        
+        <h3><span class="section-icon">🟠</span>Tests to Perform on On-Premise Side</h3>
+        
+        <h4>Test Group I: File Reception & Validation</h4>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Test Name</th>
+                    <th>What to Test</th>
+                    <th>Success Criteria</th>
+                    <th>Monitoring</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>PREM-001</strong></td>
+                    <td>File arrival detection</td>
+                    <td>Files arrive in \\&lt;FILE_SERVER&gt;\file_transfer\NBS</td>
+                    <td>File present in directory</td>
+                    <td>PowerShell script, Control-M sensor</td>
+                </tr>
+                <tr>
+                    <td><strong>PREM-002</strong></td>
+                    <td>File decryption</td>
+                    <td>Encrypted files decrypted successfully</td>
+                    <td>Decrypted file readable</td>
+                    <td>Decryption script logs</td>
+                </tr>
+                <tr>
+                    <td><strong>PREM-003</strong></td>
+                    <td>Virus scanning (on-prem AV)</td>
+                    <td>On-premise AV scans incoming files</td>
+                    <td>Scan completes, no malware found</td>
+                    <td>Antivirus logs</td>
+                </tr>
+                <tr>
+                    <td><strong>PREM-004</strong></td>
+                    <td>File permissions check</td>
+                    <td>Files have correct NTFS permissions</td>
+                    <td>Read/write access for Control-M account</td>
+                    <td>Windows Event Viewer</td>
+                </tr>
+                <tr>
+                    <td><strong>PREM-005</strong></td>
+                    <td>Disk space monitoring</td>
+                    <td>Adequate disk space for incoming files</td>
+                    <td>> 10 GB free space</td>
+                    <td>SCOM/Monitoring tool</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>Test Group J: BMC Control-M Processing</h4>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Test Name</th>
+                    <th>What to Test</th>
+                    <th>Success Criteria</th>
+                    <th>Monitoring</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>PREM-006</strong></td>
+                    <td>Control-M job triggering</td>
+                    <td>File arrival triggers Control-M job</td>
+                    <td>Job status = "Started"</td>
+                    <td>BMC Control-M dashboard</td>
+                </tr>
+                <tr>
+                    <td><strong>PREM-007</strong></td>
+                    <td>Staging copy (P_MIS5_Agresso_MI_Staging_Copy)</td>
+                    <td>Files copied to &lt;STAGING_DRIVE&gt;:\AgressoMIFeed\Staging</td>
+                    <td>Files present in staging</td>
+                    <td>Control-M job log</td>
+                </tr>
+                <tr>
+                    <td><strong>PREM-008</strong></td>
+                    <td>File preparation (P_COPY_WEBSAVE_FILES_TEMP)</td>
+                    <td>Files read and validated</td>
+                    <td>Job completes successfully</td>
+                    <td>Control-M job log</td>
+                </tr>
+                <tr>
+                    <td><strong>PREM-009</strong></td>
+                    <td>Reformatting (P_Websave_Agresso_Post_Cloud)</td>
+                    <td>Files converted to fixed-width webtrans.dat</td>
+                    <td>webtrans.dat created</td>
+                    <td>Control-M job log, file validation script</td>
+                </tr>
+                <tr>
+                    <td><strong>PREM-010</strong></td>
+                    <td>Dependency handling</td>
+                    <td>If file 1 succeeds, file 2 processes</td>
+                    <td>Both jobs complete in sequence</td>
+                    <td>Control-M dependency chain</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>Test Group K: Error Scenarios (On-Premise)</h4>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Test Name</th>
+                    <th>What to Test</th>
+                    <th>Success Criteria</th>
+                    <th>Monitoring</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>PREM-011</strong></td>
+                    <td>Missing file detection</td>
+                    <td>Control-M detects if expected file missing</td>
+                    <td>Alert sent within 30 min</td>
+                    <td>Control-M notification</td>
+                </tr>
+                <tr>
+                    <td><strong>PREM-012</strong></td>
+                    <td>Corrupted file handling</td>
+                    <td>Corrupted file fails validation gracefully</td>
+                    <td>Job fails, error logged, alert sent</td>
+                    <td>Control-M job log</td>
+                </tr>
+                <tr>
+                    <td><strong>PREM-013</strong></td>
+                    <td>Empty file handling</td>
+                    <td>Empty (0-byte) file triggers warning</td>
+                    <td>Warning logged, processing skipped</td>
+                    <td>Control-M log</td>
+                </tr>
+                <tr>
+                    <td><strong>PREM-014</strong></td>
+                    <td>Invalid format handling</td>
+                    <td>Invalid XLSX/CSV triggers error</td>
+                    <td>Error logged, file quarantined</td>
+                    <td>Control-M error handler</td>
+                </tr>
+                <tr>
+                    <td><strong>PREM-015</strong></td>
+                    <td>Job failure notification</td>
+                    <td>Failed jobs send email/SMS alert</td>
+                    <td>Alert received < 5 min</td>
+                    <td>Email/SMS logs</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>Test Group L: File Transfer to Go Anywhere Cloud</h4>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Test Name</th>
+                    <th>What to Test</th>
+                    <th>Success Criteria</th>
+                    <th>Monitoring</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>PREM-016</strong></td>
+                    <td>SFTP connection to Go Anywhere Cloud</td>
+                    <td>Connection established from on-prem</td>
+                    <td>Auth succeeds</td>
+                    <td>Control-M SFTP log</td>
+                </tr>
+                <tr>
+                    <td><strong>PREM-017</strong></td>
+                    <td>webtrans.dat upload</td>
+                    <td>Formatted file uploaded successfully</td>
+                    <td>File present in Go Anywhere Cloud</td>
+                    <td>Go Anywhere storage logs</td>
+                </tr>
+                <tr>
+                    <td><strong>PREM-018</strong></td>
+                    <td>Upload verification</td>
+                    <td>Control-M verifies file uploaded</td>
+                    <td>File size matches, no errors</td>
+                    <td>Control-M verification script</td>
+                </tr>
+                <tr>
+                    <td><strong>PREM-019</strong></td>
+                    <td>Post-upload cleanup</td>
+                    <td>Processed files archived/deleted</td>
+                    <td>Staging area cleaned up</td>
+                    <td>PowerShell cleanup script log</td>
+                </tr>
+                <tr>
+                    <td><strong>PREM-020</strong></td>
+                    <td>Audit log update</td>
+                    <td>Transfer logged in audit database</td>
+                    <td>Audit record created</td>
+                    <td>SQL query on audit table</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <hr>
+        
+        <h3><span class="section-icon">🟣</span>Tests to Perform on Go Anywhere Cloud Storage</h3>
+        
+        <h4>Test Group M: Cloud Storage & Final Transfer</h4>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Test Name</th>
+                    <th>What to Test</th>
+                    <th>Success Criteria</th>
+                    <th>Monitoring</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>GAC-001</strong></td>
+                    <td>File reception in cloud storage</td>
+                    <td>webtrans.dat received from on-prem</td>
+                    <td>File present</td>
+                    <td>SolarWinds storage monitor</td>
+                </tr>
+                <tr>
+                    <td><strong>GAC-002</strong></td>
+                    <td>Storage retention</td>
+                    <td>Files retained for required duration (e.g., 30 days)</td>
+                    <td>Files older than 30 days purged</td>
+                    <td>Go Anywhere retention policy</td>
+                </tr>
+                <tr>
+                    <td><strong>GAC-003</strong></td>
+                    <td>File integrity validation</td>
+                    <td>MD5/SHA256 checksum validated</td>
+                    <td>Checksum matches</td>
+                    <td>Go Anywhere validation log</td>
+                </tr>
+                <tr>
+                    <td><strong>GAC-004</strong></td>
+                    <td>Access control</td>
+                    <td>Only Agresso can access files</td>
+                    <td>Unauthorized access blocked</td>
+                    <td>Go Anywhere audit log</td>
+                </tr>
+                <tr>
+                    <td><strong>GAC-005</strong></td>
+                    <td>SolarWinds monitoring active</td>
+                    <td>SolarWinds monitors file status</td>
+                    <td>Real-time visibility</td>
+                    <td>SolarWinds dashboard</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>Test Group N: Final Transfer to Agresso</h4>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Test Name</th>
+                    <th>What to Test</th>
+                    <th>Success Criteria</th>
+                    <th>Monitoring</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>GAC-006</strong></td>
+                    <td>SFTP to Agresso gateway</td>
+                    <td>Connection to &lt;AGRESSO_SFTP_HOST&gt;</td>
+                    <td>Connection succeeds</td>
+                    <td>Go Anywhere transfer log</td>
+                </tr>
+                <tr>
+                    <td><strong>GAC-007</strong></td>
+                    <td>Authentication with Agresso</td>
+                    <td>SSH key authentication succeeds</td>
+                    <td>Auth verified</td>
+                    <td>Agresso SFTP logs</td>
+                </tr>
+                <tr>
+                    <td><strong>GAC-008</strong></td>
+                    <td>File path validation</td>
+                    <td>File delivered to correct path (\\S-UKSBW-APPP06\uk_wbs_prod$\Data Import)</td>
+                    <td>Path correct</td>
+                    <td>Go Anywhere logs</td>
+                </tr>
+                <tr>
+                    <td><strong>GAC-009</strong></td>
+                    <td>Transfer confirmation</td>
+                    <td>Agresso acknowledges file receipt</td>
+                    <td>ACK received</td>
+                    <td>Agresso confirmation log</td>
+                </tr>
+                <tr>
+                    <td><strong>GAC-010</strong></td>
+                    <td>Final notification</td>
+                    <td>Success notification sent to ops team</td>
+                    <td>Email/SMS received</td>
+                    <td>SolarWinds notification log</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <hr>
+        
+        <h3><span class="section-icon">🔴</span>Tests to Perform at Network/Infrastructure Level (All Locations)</h3>
+        
+        <h4>Test Group O: Network & Connectivity</h4>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Test Name</th>
+                    <th>Test Location</th>
+                    <th>What to Test</th>
+                    <th>Success Criteria</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>NET-001</strong></td>
+                    <td>VPN connectivity</td>
+                    <td>AWS ↔ On-Premise</td>
+                    <td>Site-to-Site VPN operational</td>
+                    <td>Both tunnels UP</td>
+                </tr>
+                <tr>
+                    <td><strong>NET-002</strong></td>
+                    <td>VPN failover</td>
+                    <td>AWS ↔ On-Premise</td>
+                    <td>Secondary VPN activates if primary fails</td>
+                    <td>Failover < 2 min</td>
+                </tr>
+                <tr>
+                    <td><strong>NET-003</strong></td>
+                    <td>DNS resolution</td>
+                    <td>All locations</td>
+                    <td>Hostnames resolve correctly</td>
+                    <td>nslookup succeeds</td>
+                </tr>
+                <tr>
+                    <td><strong>NET-004</strong></td>
+                    <td>Firewall rules</td>
+                    <td>All locations</td>
+                    <td>Required ports open (22 for SFTP, 443 for HTTPS)</td>
+                    <td>Connection succeeds</td>
+                </tr>
+                <tr>
+                    <td><strong>NET-005</strong></td>
+                    <td>Bandwidth testing</td>
+                    <td>All locations</td>
+                    <td>Adequate bandwidth for file transfer</td>
+                    <td>> 10 Mbps sustained</td>
+                </tr>
+                <tr>
+                    <td><strong>NET-006</strong></td>
+                    <td>Latency measurement</td>
+                    <td>All locations</td>
+                    <td>Latency within acceptable range</td>
+                    <td>< 100ms AWS to on-prem</td>
+                </tr>
+                <tr>
+                    <td><strong>NET-007</strong></td>
+                    <td>Packet loss</td>
+                    <td>All locations</td>
+                    <td>No packet loss during transfer</td>
+                    <td>0% loss</td>
+                </tr>
+                <tr>
+                    <td><strong>NET-008</strong></td>
+                    <td>MTU optimization</td>
+                    <td>All locations</td>
+                    <td>MTU configured correctly (1500 for VPN)</td>
+                    <td>No fragmentation</td>
+                </tr>
+                <tr>
+                    <td><strong>NET-009</strong></td>
+                    <td>Internet outage simulation</td>
+                    <td>All locations</td>
+                    <td>Verify detection and failover</td>
+                    <td>Alert within 2 min</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <hr>
+        
+        <h2><span class="section-icon">🚨</span>SolarWinds Monitoring & Alerting</h2>
+        
+        <h3>What SolarWinds Monitors</h3>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Metrics Monitored</th>
+                    <th>Alert Threshold</th>
+                    <th>Notification Method</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Go Anywhere MFT Platform</strong></td>
+                    <td>File transfer status, success/failure rate</td>
+                    <td>Failure rate > 5%</td>
+                    <td>Email, SMS, PagerDuty</td>
+                </tr>
+                <tr>
+                    <td><strong>File Transfer Workflows</strong></td>
+                    <td>Workflow execution time, errors</td>
+                    <td>Duration > 10 min OR any error</td>
+                    <td>Email, Slack</td>
+                </tr>
+                <tr>
+                    <td><strong>Network Connectivity</strong></td>
+                    <td>VPN status, bandwidth utilization</td>
+                    <td>VPN down OR bandwidth > 80%</td>
+                    <td>SMS, PagerDuty</td>
+                </tr>
+                <tr>
+                    <td><strong>Storage (Go Anywhere Cloud)</strong></td>
+                    <td>Disk usage, file count</td>
+                    <td>Disk > 90% full</td>
+                    <td>Email</td>
+                </tr>
+                <tr>
+                    <td><strong>SFTP Connections</strong></td>
+                    <td>Connection failures, auth failures</td>
+                    <td>> 3 failures in 5 min</td>
+                    <td>Email, SMS</td>
+                </tr>
+                <tr>
+                    <td><strong>File Age</strong></td>
+                    <td>Files not processed within SLA</td>
+                    <td>File age > 2 hours</td>
+                    <td>Email, Slack</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h3>SolarWinds Alert Examples</h3>
+        
+        <div class="success-box">
+            <h4>✅ SUCCESS NOTIFICATION:</h4>
+            <strong>Subject:</strong> File Transfer Success - CIF_Customer_Info_20250101.csv<br>
+            <strong>Body:</strong><br>
+            <ul>
+                <li>File: CIF_Customer_Info_20250101.csv</li>
+                <li>Source: AWS Banking App</li>
+                <li>Destination: \\&lt;FILE_SERVER&gt;\file_transfer\NBS</li>
+                <li>Transfer Time: 45 seconds</li>
+                <li>File Size: 12.5 MB</li>
+                <li>Status: SUCCESS</li>
+                <li>Next Step: BMC Control-M processing</li>
+            </ul>
+        </div>
+        
+        <div class="error-box">
+            <h4>❌ FAILURE NOTIFICATION:</h4>
+            <strong>Subject:</strong> URGENT - File Transfer Failed - Deposits_20250101.xlsx<br>
+            <strong>Body:</strong><br>
+            <ul>
+                <li>File: Deposits_20250101.xlsx</li>
+                <li>Source: AWS Banking App</li>
+                <li>Destination: \\&lt;FILE_SERVER&gt;\file_transfer\NBS</li>
+                <li>Error: Connection timeout after 3 retries</li>
+                <li>Retry Count: 3</li>
+                <li>Last Attempt: 2025-01-01 10:35:22 UTC</li>
+                <li>Status: FAILED</li>
+                <li>Action Required: Check VPN connectivity and retry manually</li>
+                <li>Runbook: https://wiki.example.com/file-transfer-failure</li>
+            </ul>
+        </div>
+        
+        <div class="alert-box">
+            <h4>⚠️ WARNING NOTIFICATION:</h4>
+            <strong>Subject:</strong> Warning - File Transfer Delayed - Daily_MI_20250101.xlsx<br>
+            <strong>Body:</strong><br>
+            <ul>
+                <li>File: Daily_MI_20250101.xlsx</li>
+                <li>Expected Time: 08:00 AM</li>
+                <li>Current Time: 08:45 AM</li>
+                <li>Delay: 45 minutes</li>
+                <li>Status: PENDING</li>
+                <li>Possible Cause: Network latency or source file not generated</li>
+                <li>Action: Monitor for next 15 min, then investigate</li>
+            </ul>
+        </div>
+        
+        <hr>
+        
+        <h2><span class="section-icon">🎯</span>Test Execution Responsibilities</h2>
+        
+        <h3>Team 1: AWS Team</h3>
+        <ul>
+            <li><strong>Responsible for:</strong> Tests AWS-001 through AWS-020</li>
+            <li><strong>Tools:</strong> AWS Console, AWS CLI, Boto3, Python scripts</li>
+            <li><strong>Duration:</strong> Week 1-2</li>
+        </ul>
+        
+        <h3>Team 2: MFT Team (Go Anywhere Specialists)</h3>
+        <ul>
+            <li><strong>Responsible for:</strong> Tests MFT-001 through MFT-020, GAC-001 through GAC-010</li>
+            <li><strong>Tools:</strong> Go Anywhere web console, SolarWinds, API scripts</li>
+            <li><strong>Duration:</strong> Week 2-4</li>
+        </ul>
+        
+        <h3>Team 3: On-Premise Team</h3>
+        <ul>
+            <li><strong>Responsible for:</strong> Tests PREM-001 through PREM-020</li>
+            <li><strong>Tools:</strong> BMC Control-M, PowerShell, Windows Event Viewer, SQL Server</li>
+            <li><strong>Duration:</strong> Week 3-5</li>
+        </ul>
+        
+        <h3>Team 4: Network Team</h3>
+        <ul>
+            <li><strong>Responsible for:</strong> Tests NET-001 through NET-010</li>
+            <li><strong>Tools:</strong> AWS Console, VPN monitoring, Wireshark, ping/traceroute</li>
+            <li><strong>Duration:</strong> Ongoing (parallel with other tests)</li>
+        </ul>
+        
+        <hr>
+        
+        <h2><span class="section-icon">✅</span>Summary: Where to Test What</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Test Category</th>
+                    <th>AWS</th>
+                    <th>Go Anywhere MFT</th>
+                    <th>On-Premise</th>
+                    <th>Go Anywhere Cloud</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>File Generation</strong></td>
+                    <td>✅</td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>❌</td>
+                </tr>
+                <tr>
+                    <td><strong>Anti-Malware Scanning</strong></td>
+                    <td>✅</td>
+                    <td>⚠️ (optional)</td>
+                    <td>✅</td>
+                    <td>❌</td>
+                </tr>
+                <tr>
+                    <td><strong>File Encryption</strong></td>
+                    <td>⚠️ (optional)</td>
+                    <td>✅</td>
+                    <td>⚠️ (decryption)</td>
+                    <td>❌</td>
+                </tr>
+                <tr>
+                    <td><strong>File Transfer (AWS→On-Prem)</strong></td>
+                    <td>✅ (send)</td>
+                    <td>✅ (orchestrate)</td>
+                    <td>✅ (receive)</td>
+                    <td>❌</td>
+                </tr>
+                <tr>
+                    <td><strong>Virus Scanning (On-Prem)</strong></td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>✅</td>
+                    <td>❌</td>
+                </tr>
+                <tr>
+                    <td><strong>BMC Control-M Processing</strong></td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>✅</td>
+                    <td>❌</td>
+                </tr>
+                <tr>
+                    <td><strong>File Reformatting</strong></td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>✅</td>
+                    <td>❌</td>
+                </tr>
+                <tr>
+                    <td><strong>SFTP to Go Anywhere Cloud</strong></td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>✅ (send)</td>
+                    <td>✅ (receive)</td>
+                </tr>
+                <tr>
+                    <td><strong>Final Transfer to Agresso</strong></td>
+                    <td>❌</td>
+                    <td>✅</td>
+                    <td>❌</td>
+                    <td>✅</td>
+                </tr>
+                <tr>
+                    <td><strong>SolarWinds Monitoring</strong></td>
+                    <td>⚠️ (integrated)</td>
+                    <td>✅</td>
+                    <td>⚠️ (integrated)</td>
+                    <td>✅</td>
+                </tr>
+                <tr>
+                    <td><strong>Error Handling & Retry</strong></td>
+                    <td>✅</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                </tr>
+                <tr>
+                    <td><strong>Backup & Recovery</strong></td>
+                    <td>✅</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="legend">
+            <strong>Legend:</strong><br>
+            <span class="legend-item">✅ = Primary responsibility</span>
+            <span class="legend-item">⚠️ = Secondary/optional involvement</span>
+            <span class="legend-item">❌ = Not applicable</span>
+        </div>
+        
+        <hr>
+        
+        <h2><span class="section-icon">📞</span>Contact Information</h2>
+        
+        <table class="contact-table">
+            <thead>
+                <tr>
+                    <th>Team</th>
+                    <th>Contact</th>
+                    <th>Responsibilities</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>AWS Team</strong></td>
+                    <td>aws-platform@example.com</td>
+                    <td>File generation, AWS Transfer Family, Lambda functions</td>
+                </tr>
+                <tr>
+                    <td><strong>MFT Team</strong></td>
+                    <td>mft-team@example.com</td>
+                    <td>Go Anywhere MFT, SolarWinds monitoring, file orchestration</td>
+                </tr>
+                <tr>
+                    <td><strong>On-Premise Team</strong></td>
+                    <td>on-prem-ops@example.com</td>
+                    <td>File reception, BMC Control-M, file processing</td>
+                </tr>
+                <tr>
+                    <td><strong>Network Team</strong></td>
+                    <td>network-ops@example.com</td>
+                    <td>VPN, Direct Connect, firewall, connectivity</td>
+                </tr>
+                <tr>
+                    <td><strong>Agresso Team</strong></td>
+                    <td>agresso-support@example.com</td>
+                    <td>Final file reception, Agresso SFTP gateway</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="footer">
+            <p><strong>Document Version:</strong> 1.0</p>
+            <p><strong>Last Updated:</strong> 2025-01-XX</p>
+            <p><strong>Owner:</strong> Platform Engineering Team</p>
+            <p><strong>Review Date:</strong> Quarterly</p>
+            <hr>
+            <p><em>This document clarifies the testing locations for the AWS-to-On-Premise file transfer architecture with Go Anywhere MFT and SolarWinds monitoring.</em></p>
+        </div>
+    </div>
+</body>
+</html>
