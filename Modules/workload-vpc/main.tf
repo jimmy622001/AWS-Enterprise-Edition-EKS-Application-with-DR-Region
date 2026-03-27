@@ -214,14 +214,19 @@ resource "aws_route_table_association" "database" {
 #====================================================================
 # APPLICATION LOAD BALANCER (ALB)
 #====================================================================
+# SECURITY NOTE: This ALB is intentionally internet-facing and public
+# Purpose: Serves web application content to end users globally
+# Security Layers: WAF, CloudFront CDN, TLS/SSL encryption, Cognito authentication
+# The 0.0.0.0/0 ingress on ports 80/443 is required for public web applications
+#====================================================================
 
 resource "aws_security_group" "alb" {
   name        = "${var.project_name}-${var.environment}-workload-alb-sg"
-  description = "Security group for Application Load Balancer"
+  description = "Security group for public-facing Application Load Balancer"
   vpc_id      = aws_vpc.workload.id
 
   ingress {
-    description = "HTTPS from anywhere"
+    description = "HTTPS from internet - Public web application (protected by WAF)"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -229,7 +234,7 @@ resource "aws_security_group" "alb" {
   }
 
   ingress {
-    description = "HTTP from anywhere (redirect to HTTPS)"
+    description = "HTTP from internet - Redirects to HTTPS (protected by WAF)"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -266,6 +271,7 @@ resource "aws_lb" "application" {
 
   enable_deletion_protection = true
   enable_http2               = true
+  drop_invalid_header_fields = true
 
   access_logs {
     bucket  = aws_s3_bucket.alb_logs.id
@@ -311,6 +317,15 @@ resource "aws_s3_bucket_versioning" "alb_logs" {
   versioning_configuration {
     status = "Enabled"
   }
+}
+
+resource "aws_s3_bucket_logging" "alb_logs" {
+  count = var.access_logs_bucket_name != "" ? 1 : 0
+
+  bucket = aws_s3_bucket.alb_logs.id
+
+  target_bucket = var.access_logs_bucket_name
+  target_prefix = "alb-logs-bucket/"
 }
 
 resource "aws_s3_bucket_policy" "alb_logs" {
