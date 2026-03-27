@@ -305,6 +305,13 @@ resource "aws_s3_bucket_public_access_block" "transfer" {
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket_logging" "transfer" {
+  bucket = aws_s3_bucket.transfer.id
+
+  target_bucket = aws_s3_bucket.access_logs.id
+  target_prefix = "transfer/"
+}
+
 # Transfer Family IAM Roles
 resource "aws_iam_role" "transfer_logging" {
   name = "${var.project_name}-${var.environment}-transfer-logging-role"
@@ -581,6 +588,13 @@ resource "aws_s3_bucket_public_access_block" "quarantine" {
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket_logging" "quarantine" {
+  bucket = aws_s3_bucket.quarantine.id
+
+  target_bucket = aws_s3_bucket.access_logs.id
+  target_prefix = "quarantine/"
+}
+
 # Anti-Malware Lambda Function
 resource "aws_lambda_function" "antimalware_scanner" {
   function_name = "${var.project_name}-${var.environment}-antimalware-scanner"
@@ -596,6 +610,10 @@ resource "aws_lambda_function" "antimalware_scanner" {
   vpc_config {
     subnet_ids         = aws_subnet.private[*].id
     security_group_ids = [aws_security_group.lambda.id]
+  }
+
+  tracing_config {
+    mode = "Active"
   }
 
   environment {
@@ -673,6 +691,11 @@ resource "aws_iam_role" "antimalware_lambda" {
 resource "aws_iam_role_policy_attachment" "antimalware_lambda_vpc" {
   role       = aws_iam_role.antimalware_lambda.name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "antimalware_lambda_xray" {
+  role       = aws_iam_role.antimalware_lambda.name
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
 
 resource "aws_iam_role_policy" "antimalware_lambda" {
@@ -1010,6 +1033,13 @@ resource "aws_s3_bucket_public_access_block" "ses_incoming" {
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket_logging" "ses_incoming" {
+  bucket = aws_s3_bucket.ses_incoming.id
+
+  target_bucket = aws_s3_bucket.access_logs.id
+  target_prefix = "ses-incoming/"
+}
+
 resource "aws_s3_bucket_policy" "ses_incoming" {
   bucket = aws_s3_bucket.ses_incoming.id
 
@@ -1112,6 +1142,86 @@ resource "aws_sns_topic_policy" "alerts" {
 # S3 BUCKETS - SHARED STORAGE
 #====================================================================
 
+# Central S3 Access Logging Bucket
+resource "aws_s3_bucket" "access_logs" {
+  bucket = "${var.project_name}-${var.environment}-s3-access-logs-${data.aws_caller_identity.current.account_id}"
+
+  tags = merge(var.tags, {
+    Name = "${var.project_name}-${var.environment}-s3-access-logs"
+    Purpose = "Central S3 Access Logging"
+  })
+}
+
+resource "aws_s3_bucket_versioning" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.shared_services.arn
+    }
+    bucket_key_enabled = true
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+
+  rule {
+    id     = "delete-old-logs"
+    status = "Enabled"
+
+    transition {
+      days          = 90
+      storage_class = "GLACIER"
+    }
+
+    expiration {
+      days = 365
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowS3ServerAccessLogsPolicy"
+        Effect = "Allow"
+        Principal = {
+          Service = "logging.s3.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${aws_s3_bucket.access_logs.arn}/*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      }
+    ]
+  })
+}
+
 resource "aws_s3_bucket" "shared_data" {
   bucket = "${var.project_name}-${var.environment}-shared-data-${data.aws_caller_identity.current.account_id}"
 
@@ -1146,6 +1256,13 @@ resource "aws_s3_bucket_public_access_block" "shared_data" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_logging" "shared_data" {
+  bucket = aws_s3_bucket.shared_data.id
+
+  target_bucket = aws_s3_bucket.access_logs.id
+  target_prefix = "shared-data/"
 }
 
 resource "aws_s3_bucket_policy" "shared_data" {
@@ -1290,6 +1407,13 @@ resource "aws_s3_bucket_public_access_block" "crl" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_logging" "crl" {
+  bucket = aws_s3_bucket.crl.id
+
+  target_bucket = aws_s3_bucket.access_logs.id
+  target_prefix = "crl/"
 }
 
 resource "aws_s3_bucket_policy" "crl" {
