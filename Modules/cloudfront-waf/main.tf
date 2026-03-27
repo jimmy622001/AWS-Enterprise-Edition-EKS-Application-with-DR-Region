@@ -17,6 +17,116 @@ terraform {
 }
 
 #====================================================================
+# KMS KEY FOR CLOUDWATCH LOGS
+#====================================================================
+
+resource "aws_kms_key" "cloudwatch" {
+  description             = "KMS key for CloudWatch Logs encryption"
+  deletion_window_in_days = 30
+  enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "Enable IAM User Permissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow CloudWatch Logs"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.${data.aws_region.current.name}.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
+        ]
+        Resource = "*"
+        Condition = {
+          ArnLike = {
+            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*"
+          }
+        }
+      }
+    ]
+  })
+
+  tags = merge(var.tags, {
+    Name = "${var.project_name}-${var.environment}-cloudwatch-kms"
+  })
+}
+
+resource "aws_kms_alias" "cloudwatch" {
+  name          = "alias/${var.project_name}-${var.environment}-cloudwatch"
+  target_key_id = aws_kms_key.cloudwatch.key_id
+}
+
+#====================================================================
+# KMS KEY FOR US-EAST-1 (CloudWatch Logs in us-east-1)
+#====================================================================
+
+resource "aws_kms_key" "cloudwatch_us_east_1" {
+  provider                = aws.us-east-1
+  description             = "KMS key for CloudWatch Logs encryption in us-east-1"
+  deletion_window_in_days = 30
+  enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "Enable IAM User Permissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow CloudWatch Logs"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.us-east-1.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
+        ]
+        Resource = "*"
+        Condition = {
+          ArnLike = {
+            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:*"
+          }
+        }
+      }
+    ]
+  })
+
+  tags = merge(var.tags, {
+    Name = "${var.project_name}-${var.environment}-cloudwatch-us-east-1-kms"
+  })
+}
+
+resource "aws_kms_alias" "cloudwatch_us_east_1" {
+  provider      = aws.us-east-1
+  name          = "alias/${var.project_name}-${var.environment}-cloudwatch-us-east-1"
+  target_key_id = aws_kms_key.cloudwatch_us_east_1.key_id
+}
+
+#====================================================================
 # DATA SOURCES
 #====================================================================
 
@@ -407,6 +517,7 @@ resource "aws_cloudwatch_log_group" "waf_cloudfront" {
   provider          = aws.us-east-1
   name              = "aws-waf-logs-${var.project_name}-${var.environment}-cloudfront"
   retention_in_days = 30
+  kms_key_id        = aws_kms_key.cloudwatch_us_east_1.arn
 
   tags = var.tags
 }
@@ -436,6 +547,7 @@ resource "aws_wafv2_web_acl_logging_configuration" "cloudfront" {
 resource "aws_cloudwatch_log_group" "waf_regional" {
   name              = "aws-waf-logs-${var.project_name}-${var.environment}-regional"
   retention_in_days = 30
+  kms_key_id        = aws_kms_key.cloudwatch.arn
 
   tags = var.tags
 }
@@ -556,6 +668,14 @@ resource "aws_s3_bucket_lifecycle_configuration" "cloudfront_logs" {
   }
 }
 
+resource "aws_s3_bucket_logging" "cloudfront_logs" {
+  count  = var.access_logs_bucket_name != "" ? 1 : 0
+  bucket = aws_s3_bucket.cloudfront_logs.id
+
+  target_bucket = var.access_logs_bucket_name
+  target_prefix = "cloudfront-logs-bucket/"
+}
+
 #====================================================================
 # S3 BUCKET - WEB STATIC ASSETS
 #====================================================================
@@ -618,6 +738,14 @@ resource "aws_s3_bucket_policy" "web_assets" {
   })
 }
 
+resource "aws_s3_bucket_logging" "web_assets" {
+  count  = var.access_logs_bucket_name != "" ? 1 : 0
+  bucket = aws_s3_bucket.web_assets.id
+
+  target_bucket = var.access_logs_bucket_name
+  target_prefix = "web-assets/"
+}
+
 #====================================================================
 # S3 BUCKET - CMS ASSETS
 #====================================================================
@@ -678,6 +806,14 @@ resource "aws_s3_bucket_policy" "cms_assets" {
       }
     ]
   })
+}
+
+resource "aws_s3_bucket_logging" "cms_assets" {
+  count  = var.access_logs_bucket_name != "" ? 1 : 0
+  bucket = aws_s3_bucket.cms_assets.id
+
+  target_bucket = var.access_logs_bucket_name
+  target_prefix = "cms-assets/"
 }
 
 #====================================================================
@@ -813,7 +949,7 @@ resource "aws_cloudfront_distribution" "web" {
   viewer_certificate {
     acm_certificate_arn            = var.acm_certificate_arn_us_east_1
     ssl_support_method             = "sni-only"
-    minimum_protocol_version       = "TLSv1.2_2021"
+    minimum_protocol_version       = "TLSv1.2_2019"
     cloudfront_default_certificate = false
   }
 
@@ -919,7 +1055,7 @@ resource "aws_cloudfront_distribution" "cms" {
   viewer_certificate {
     acm_certificate_arn            = var.acm_certificate_arn_us_east_1
     ssl_support_method             = "sni-only"
-    minimum_protocol_version       = "TLSv1.2_2021"
+    minimum_protocol_version       = "TLSv1.2_2019"
     cloudfront_default_certificate = false
   }
 
@@ -1104,6 +1240,7 @@ resource "aws_wafv2_web_acl_association" "api_gateway" {
 resource "aws_cloudwatch_log_group" "api_gateway" {
   name              = "/aws/api-gateway/${var.project_name}-${var.environment}"
   retention_in_days = 30
+  kms_key_id        = aws_kms_key.cloudwatch.arn
 
   tags = var.tags
 }
@@ -1182,6 +1319,7 @@ resource "aws_api_gateway_domain_name" "main" {
   count                    = var.api_domain_name != "" ? 1 : 0
   domain_name              = var.api_domain_name
   regional_certificate_arn = var.acm_certificate_arn_regional
+  security_policy          = "TLS_1_2"
 
   endpoint_configuration {
     types = ["REGIONAL"]
