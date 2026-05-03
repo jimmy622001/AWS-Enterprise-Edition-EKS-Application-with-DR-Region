@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-Your Terraform infrastructure has been successfully upgraded to use **Terraform Workspaces** for managing multiple environments (POC, Dev, Staging, UAT, Prod) with a **single codebase**.
+Upgraded to use **Terraform Workspaces** for managing multiple environments (POC, Dev, Staging, UAT, Prod) with a **single codebase**.
 
 This eliminates the need for manual code commenting/uncommenting and provides clean separation between environments while maintaining code consistency.
 
